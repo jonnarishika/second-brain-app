@@ -18,7 +18,7 @@ export default function AddKnowledge() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setAiStatus('Creating knowledge item...');
+    setAiStatus('Capturing your thought...');
 
     try {
       // 1. Create the item
@@ -33,8 +33,8 @@ export default function AddKnowledge() {
       const item = await createResponse.json();
 
       // 2. Generate AI summary
-      setAiStatus('Generating AI summary...');
-      const summaryResponse = await fetch('/api/ai/summarize', {
+      setAiStatus('Understanding the content...');
+      await fetch('/api/ai/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,8 +44,8 @@ export default function AddKnowledge() {
       });
 
       // 3. Generate AI tags
-      setAiStatus('Generating AI tags...');
-      const tagsResponse = await fetch('/api/ai/tags', {
+      setAiStatus('Creating connections...');
+      await fetch('/api/ai/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -55,141 +55,142 @@ export default function AddKnowledge() {
         }),
       });
 
-      setAiStatus('Success! Redirecting...');
+      setAiStatus('Complete');
       
       // Redirect to dashboard
       setTimeout(() => {
-        router.push('/');
-      }, 1000);
+        router.push('/dashboards');  // After saving;
+      }, 800);
 
     } catch (error) {
       console.error('Error:', error);
-      setAiStatus('Error creating item. Please try again.');
+      setAiStatus('Something went wrong. Please try again.');
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-[#F5F3EF]">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-6 py-6">
+      <header className="border-b border-[#E5E1D8] bg-[#FDFCFA]">
+        <div className="max-w-4xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">
-                ✨ Add Knowledge
+              <h1 className="text-[32px] font-normal text-[#1A1A1A] tracking-tight leading-none mb-2">
+                New thought
               </h1>
-              <p className="text-slate-600 mt-1">
-                Capture your ideas — AI will enhance them
+              <p className="text-[15px] text-[#6B6B6B] font-light">
+                Capture what's on your mind
               </p>
             </div>
             <Link
-              href="/"
-              className="px-4 py-2 text-slate-700 hover:text-slate-900 transition-colors"
+              href="/dashboards"
+              className="text-[15px] text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors font-normal"
             >
-              ← Back to Dashboard
+              Cancel
             </Link>
           </div>
         </div>
       </header>
 
       {/* Form */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+      <main className="max-w-4xl mx-auto px-8 py-12">
+        <form onSubmit={handleSubmit} className="space-y-10">
           {/* Title */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Title *
+          <div className="space-y-3">
+            <label className="block text-[14px] font-normal text-[#6B6B6B] tracking-wide">
+              Title
             </label>
             <input
               type="text"
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="e.g., Understanding React Hooks"
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              placeholder="What's this about?"
+              className="w-full px-0 py-4 bg-transparent border-0 border-b-2 border-[#E5E1D8] text-[32px] font-normal text-[#1A1A1A] placeholder:text-[#C4C0B7] focus:outline-none focus:border-[#1A1A1A] transition-colors"
             />
           </div>
 
           {/* Content */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Content *
+          <div className="space-y-3">
+            <label className="block text-[14px] font-normal text-[#6B6B6B] tracking-wide">
+              Content
             </label>
             <textarea
               required
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="Paste your notes, article, or insights here..."
-              rows={12}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+              placeholder="Write or paste your thoughts here..."
+              rows={16}
+              className="w-full px-0 py-4 bg-transparent border-0 text-[17px] text-[#1A1A1A] placeholder:text-[#C4C0B7] focus:outline-none resize-none leading-relaxed font-light"
             />
-            <p className="text-xs text-slate-500 mt-2">
-              💡 AI will automatically summarize and tag this content
-            </p>
           </div>
 
-          {/* Type */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Type *
-            </label>
-            <select
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              <option value="note">📝 Note</option>
-              <option value="link">🔗 Link</option>
-              <option value="insight">💡 Insight</option>
-            </select>
-          </div>
+          {/* Metadata */}
+          <div className="grid grid-cols-2 gap-6 pt-8 border-t border-[#E5E1D8]">
+            {/* Type */}
+            <div className="space-y-3">
+              <label className="block text-[14px] font-normal text-[#6B6B6B] tracking-wide">
+                Type
+              </label>
+              <select
+                value={formData.type}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                className="w-full px-5 py-3.5 bg-white border border-[#E5E1D8] rounded-xl text-[15px] text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] focus:border-transparent transition-all"
+              >
+                <option value="note">Note</option>
+                <option value="link">Link</option>
+                <option value="insight">Insight</option>
+              </select>
+            </div>
 
-          {/* Source URL (Optional) */}
-          <div className="mb-8">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Source URL (optional)
-            </label>
-            <input
-              type="url"
-              value={formData.sourceUrl}
-              onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
-              placeholder="https://example.com/article"
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
+            {/* Source URL (Optional) */}
+            <div className="space-y-3">
+              <label className="block text-[14px] font-normal text-[#6B6B6B] tracking-wide">
+                Source (optional)
+              </label>
+              <input
+                type="url"
+                value={formData.sourceUrl}
+                onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
+                placeholder="https://..."
+                className="w-full px-5 py-3.5 bg-white border border-[#E5E1D8] rounded-xl text-[15px] text-[#1A1A1A] placeholder:text-[#C4C0B7] focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] focus:border-transparent transition-all"
+              />
+            </div>
           </div>
 
           {/* AI Status */}
           {aiStatus && (
-            <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <p className="text-sm text-emerald-800 flex items-center gap-2">
+            <div className="p-6 bg-[#FAF9F7] rounded-[20px] border border-[#E5E1D8]">
+              <div className="flex items-center gap-3">
                 {loading && (
-                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-emerald-600 border-r-transparent"></span>
+                  <div className="flex gap-2">
+                    <div className="w-1.5 h-1.5 bg-[#A8A8A8] rounded-full animate-bounce"></div>
+                    <div className="w-1.5 h-1.5 bg-[#A8A8A8] rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
+                    <div className="w-1.5 h-1.5 bg-[#A8A8A8] rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                  </div>
                 )}
-                {aiStatus}
-              </p>
+                <p className="text-[15px] text-[#2D2D2D] font-light">
+                  {aiStatus}
+                </p>
+              </div>
             </div>
           )}
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-6 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Processing with AI...' : '✨ Save & Enhance with AI'}
-          </button>
+          <div className="flex items-center justify-between pt-8">
+            <p className="text-[13px] text-[#A8A8A8] font-light">
+              AI will summarize and organize
+            </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-8 py-3.5 bg-[#1A1A1A] text-[#FDFCFA] text-[15px] font-normal rounded-full hover:bg-[#2D2D2D] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Saving...' : 'Save'}
+            </button>
+          </div>
         </form>
-
-        {/* Info Box */}
-        <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-semibold text-blue-900 mb-2">🤖 How AI Helps:</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Generates concise 2-3 sentence summary</li>
-            <li>• Auto-suggests relevant tags for organization</li>
-            <li>• Makes your knowledge easily searchable</li>
-          </ul>
-        </div>
       </main>
     </div>
   );
