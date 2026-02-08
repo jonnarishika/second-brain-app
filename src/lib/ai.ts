@@ -102,7 +102,7 @@ export async function generateTags(title: string, content: string): Promise<stri
 // Helper: Extract keywords for tags
 function extractKeywords(title: string, content: string): string[] {
   const text = (title + ' ' + title + ' ' + content).toLowerCase(); // Weight title
-  const words = text.match(/\b[a-z]{4,}\b/g) || [];
+  const words: string[] = text.match(/\b[a-z]{4,}\b/g) ?? [];
   
   const stopWords = new Set([
     'this', 'that', 'with', 'from', 'have', 'been', 'were',
